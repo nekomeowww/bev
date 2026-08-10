@@ -1,0 +1,87 @@
+name: Release Bev
+
+on:
+  release:
+    types: [prereleased]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Platform to build
+        required: true
+        default: all
+        type: choice
+        options: [all, windows, macos, linux]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.artifact }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: windows-x64
+            platform: windows
+            builder_args: --win --x64
+          - os: macos-15-intel
+            artifact: macos-x64
+            platform: macos
+            builder_args: --mac --x64
+          - os: macos-26
+            artifact: macos-arm64
+            platform: macos
+            builder_args: --mac --arm64
+          - os: ubuntu-latest
+            artifact: linux-x64
+            platform: linux
+            builder_args: --linux --x64
+          - os: ubuntu-24.04-arm
+            artifact: linux-arm64
+            platform: linux
+            builder_args: --linux --arm64
+    runs-on: ${{ matrix.os }}
+    if: github.event_name == 'release' || inputs.platform == 'all' || inputs.platform == matrix.platform
+    defaults:
+      run:
+        working-directory: apps/bev
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Import macOS signing certificate
+        if: runner.os == 'macOS'
+        run: |
+          echo "$CSC_CONTENT" | base64 --decode > signing.p12
+          echo "CSC_LINK=$PWD/signing.p12" >> "$GITHUB_ENV"
+        env:
+          CSC_CONTENT: ${{ secrets.CSC_CONTENT }}
+      - name: Build distributable
+        run: pnpm exec electron-builder ${{ matrix.builder_args }} --publish=${{ github.event_name == 'release' && 'onTagOrDraft' || 'never' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_DEVELOPER_APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_DEVELOPER_APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
+      - name: Build Flatpak
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder elfutils
+          flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak-builder --user --install-deps-from=flathub flatpak io.github.nekomeowww.bev.flatpak.yml --force-clean
+          flatpak build-export flatpak-repo flatpak
+          flatpak build-bundle flatpak-repo dist/Bev-${{ matrix.artifact }}.flatpak io.github.nekomeowww.bev
+      - uses: actions/upload-artifact@v7
+        with:
+          name: bev-${{ matrix.artifact }}
+          path: apps/bev/dist/*

@@ -1,0 +1,293 @@
+<script setup lang="ts">
+import type { ContextReference } from './features/workspace/model'
+
+import { computed, shallowRef, watch } from 'vue'
+
+import AnnotationPopover from './features/annotations/AnnotationPopover.vue'
+import { useAnnotations } from './features/annotations/useAnnotations'
+import { provideBevDockContext } from './features/dock/context'
+import EditorHost from './features/editor/EditorHost.vue'
+import StableInspector from './features/inspector/StableInspector.vue'
+import SettingsPopover from './features/settings/SettingsPopover.vue'
+import { useUiPreferences } from './features/settings/useUiPreferences'
+import ActivityBar from './features/workbench/ActivityBar.vue'
+import StatusBar from './features/workbench/StatusBar.vue'
+import WorkspaceSidebar from './features/workspace/WorkspaceSidebar.vue'
+import { useWorkspace } from './features/workspace/useWorkspace'
+
+const workspace = useWorkspace()
+const annotations = useAnnotations()
+const uiPreferences = useUiPreferences()
+const annotationMode = shallowRef(false)
+const sidebarVisible = shallowRef(true)
+const platform = window.bev.platform
+const minimumSidebarWidth = 180
+const maximumSidebarWidth = 480
+const defaultSidebarWidth = 240
+const sidebarWidthStorageKey = 'bev:sidebar-width:v1'
+const sidebarWidth = shallowRef(readSidebarWidth())
+const resizingSidebar = shallowRef(false)
+let resizeStartX = 0
+let resizeStartWidth = defaultSidebarWidth
+
+const workspaceGridStyle = computed(() => ({
+  gridTemplateColumns: sidebarVisible.value
+    ? `${sidebarWidth.value}px 4px minmax(0, 1fr)`
+    : '0 0 minmax(0, 1fr)',
+}))
+
+function beginSidebarResize(event: PointerEvent): void {
+  const handle = event.currentTarget as HTMLElement
+  resizeStartX = event.clientX
+  resizeStartWidth = sidebarWidth.value
+  resizingSidebar.value = true
+  handle.setPointerCapture(event.pointerId)
+}
+
+function resizeSidebar(event: PointerEvent): void {
+  if (!resizingSidebar.value)
+    return
+  sidebarWidth.value = clampSidebarWidth(resizeStartWidth + event.clientX - resizeStartX)
+}
+
+function endSidebarResize(event: PointerEvent): void {
+  if (!resizingSidebar.value)
+    return
+  resizingSidebar.value = false
+  const handle = event.currentTarget as HTMLElement
+  if (handle.hasPointerCapture(event.pointerId))
+    handle.releasePointerCapture(event.pointerId)
+}
+
+function resizeSidebarWithKeyboard(event: KeyboardEvent): void {
+  switch (event.key) {
+    case 'ArrowLeft':
+      sidebarWidth.value = clampSidebarWidth(sidebarWidth.value - 12)
+      break
+    case 'ArrowRight':
+      sidebarWidth.value = clampSidebarWidth(sidebarWidth.value + 12)
+      break
+    case 'Home':
+      sidebarWidth.value = minimumSidebarWidth
+      break
+    case 'End':
+      sidebarWidth.value = maximumSidebarWidth
+      break
+    default:
+      return
+  }
+  event.preventDefault()
+}
+
+function clampSidebarWidth(width: number): number {
+  return Math.min(maximumSidebarWidth, Math.max(minimumSidebarWidth, width))
+}
+
+function readSidebarWidth(): number {
+  const stored = localStorage.getItem(sidebarWidthStorageKey)
+  if (stored === null)
+    return defaultSidebarWidth
+  const width = Number(stored)
+  return Number.isFinite(width) ? clampSidebarWidth(width) : defaultSidebarWidth
+}
+
+function beginAnnotation(
+  references: ContextReference[],
+  point: { x: number, y: number },
+): void {
+  annotations.begin(references, point)
+}
+
+function addContext(reference: ContextReference): void {
+  if (annotations.open.value) {
+    annotations.addContext(reference)
+    return
+  }
+  annotations.begin([reference], { x: window.innerWidth / 2, y: 120 })
+}
+
+function copySavedAnnotations(): void {
+  const markdown = annotations.annotations.value.map((annotation, index) => [
+    `## Annotation ${index + 1}`,
+    '',
+    annotation.note,
+    '',
+    ...annotation.targets.map(target => `- Target: \`${target.path}\` — ${target.label}`),
+    ...annotation.context.map(context => `- Context: \`${context.path}\` — ${context.label}`),
+  ].join('\n')).join('\n\n')
+  void navigator.clipboard.writeText(markdown)
+}
+
+provideBevDockContext({
+  workspace,
+  annotations,
+  annotationMode,
+  beginAnnotation,
+  addContext,
+})
+
+watch(
+  () => workspace.workspace.value?.rootPath,
+  (rootPath, previousRootPath) => {
+    if (previousRootPath !== undefined && rootPath !== previousRootPath)
+      annotations.reset()
+  },
+)
+
+watch(sidebarWidth, width => localStorage.setItem(sidebarWidthStorageKey, String(width)))
+</script>
+
+<template>
+  <main
+    :class="[
+      'bev-app relative box-border grid h-screen w-screen min-h-0 min-w-0 grid-rows-[38px_minmax(0,1fr)_24px] overflow-hidden p-1 pt-0',
+      'bg-[var(--app-wash)]',
+      'transition-[grid-template-columns] duration-200 ease-out motion-reduce:transition-none',
+    ]"
+    :data-platform="platform"
+    :data-sidebar-open="sidebarVisible"
+    :style="workspaceGridStyle"
+  >
+    <div
+      v-if="platform === 'darwin'"
+      aria-hidden="true"
+      class="window-drag-region absolute inset-x-0 top-0 h-[38px]"
+    />
+
+    <button
+      :class="[
+        'window-no-drag absolute z-70 inline-flex size-7 items-center justify-center border-0 rounded-lg bg-transparent p-0',
+        'text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
+        'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
+        platform === 'darwin' ? 'left-19 top-1.5' : 'left-2 top-1.25',
+      ]"
+      type="button"
+      aria-controls="workspace-sidebar"
+      :aria-expanded="sidebarVisible"
+      :aria-label="sidebarVisible ? 'Collapse sidebar' : 'Expand sidebar'"
+      :title="sidebarVisible ? 'Collapse sidebar' : 'Expand sidebar'"
+      @click="sidebarVisible = !sidebarVisible"
+    >
+      <div
+        aria-hidden="true"
+        :class="[
+          'size-4',
+          sidebarVisible ? 'i-mingcute:layout-leftbar-close-line' : 'i-mingcute:layout-left-line',
+        ]"
+      />
+    </button>
+
+    <aside
+      id="workspace-sidebar"
+      class="pointer-events-none col-start-1 row-span-2 min-h-0 min-w-0 overflow-hidden"
+      :aria-hidden="!sidebarVisible"
+    >
+      <div
+        :class="[
+          'flex h-full shrink-0 flex-col',
+          'transition-[transform,opacity] duration-200 ease-out motion-reduce:transition-none',
+          sidebarVisible
+            ? 'pointer-events-auto [transform:translateX(0)] opacity-100'
+            : 'pointer-events-none [transform:translateX(-100%)] opacity-0',
+        ]"
+        :style="{ width: `${sidebarWidth}px` }"
+        :inert="!sidebarVisible"
+      >
+        <div class="h-[38px] shrink-0" />
+        <ActivityBar class="shrink-0" />
+        <WorkspaceSidebar
+          class="min-h-0 flex-1"
+          :state="workspace.workspaceState.value"
+          :outline-state="workspace.outlineState.value"
+          @open-workspace="workspace.openWorkspace()"
+          @select-file="workspace.openFile"
+          @add-context="addContext"
+        />
+      </div>
+    </aside>
+
+    <div
+      :class="[
+        'group window-no-drag relative z-30 col-start-2 row-span-2 row-start-1 flex h-full w-1 items-center justify-center cursor-col-resize touch-none outline-none',
+        'focus-visible:bg-[var(--accent-wash)]',
+        'transition-opacity duration-200 ease-out motion-reduce:transition-none',
+        sidebarVisible ? 'opacity-100' : 'pointer-events-none opacity-0',
+      ]"
+      role="separator"
+      aria-label="Resize Explorer"
+      :aria-hidden="!sidebarVisible"
+      aria-orientation="vertical"
+      :aria-valuemin="minimumSidebarWidth"
+      :aria-valuemax="maximumSidebarWidth"
+      :aria-valuenow="sidebarWidth"
+      :tabindex="sidebarVisible ? 0 : -1"
+      @dblclick="sidebarWidth = defaultSidebarWidth"
+      @pointerdown.prevent="beginSidebarResize"
+      @pointermove="resizeSidebar"
+      @pointerup="endSidebarResize"
+      @pointercancel="endSidebarResize"
+      @keydown="resizeSidebarWithKeyboard"
+    >
+      <span
+        aria-hidden="true"
+        :class="[
+          'h-full w-px bg-transparent transition-colors',
+          'group-hover:bg-[var(--border-strong)] group-focus-visible:bg-[var(--accent)]',
+          resizingSidebar && 'bg-[var(--accent)]',
+        ]"
+      />
+    </div>
+
+    <section
+      :class="[
+        'relative col-start-3 row-span-2 row-start-1 min-h-0 min-w-0 overflow-hidden',
+      ]"
+      aria-label="Editor area"
+    >
+      <EditorHost />
+      <StableInspector :open="workspace.detailReference.value !== null" />
+    </section>
+
+    <div class="window-no-drag absolute right-2 top-1.25 z-70">
+      <SettingsPopover
+        :font-size="uiPreferences.fontSize.value"
+        @set-font-size="uiPreferences.setFontSize"
+      />
+    </div>
+
+    <StatusBar
+      :workspace-state="workspace.workspaceState.value"
+      :outline-state="workspace.outlineState.value"
+      :active-path="workspace.activePath.value"
+      @open-workspace="workspace.openWorkspace()"
+    />
+
+    <button
+      v-if="annotations.annotations.value.length"
+      :class="[
+        'absolute bottom-7 right-2 z-50 flex h-6 items-center gap-1 px-2',
+        'border border-[var(--border-strong)] rounded-lg',
+        'bg-[var(--surface-popover)] [font-size:var(--font-size-ui-2xs)] text-[var(--text-secondary)] shadow-sm backdrop-blur-xl',
+        'font-[var(--font-mono)] focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
+      ]"
+      type="button"
+      aria-label="Copy all annotations"
+      title="Copy all annotations"
+      @click="copySavedAnnotations"
+    >
+      <div aria-hidden="true" class="i-mingcute:copy-2-line size-3" />
+      {{ annotations.annotations.value.length }}
+    </button>
+
+    <AnnotationPopover
+      :open="annotations.open.value"
+      :anchor="annotations.anchor.value"
+      :targets="annotations.targets.value"
+      :context="annotations.context.value"
+      @close="annotations.close"
+      @save="annotations.save"
+      @add-context="annotations.addContext"
+      @remove-context="annotations.removeContext"
+    />
+  </main>
+</template>

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Bev
+Exec=bev %U
+Terminal=false
+Type=Application
+Icon=io.github.nekomeowww.bev
+StartupWMClass=Bev
+Comment=Bev desktop application
+Categories=Utility;

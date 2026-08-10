@@ -1,0 +1,40 @@
+{
+  "name": "@nekomeowww/cint",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "pnpm clean && tsc -p tsconfig.build.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "clean": "node scripts/clean.mjs",
+    "prototype:rust": "tsx prototypes/rust-lsp.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "vscode-jsonrpc": "9.0.1",
+    "vscode-languageserver-protocol": "3.18.2"
+  },
+  "devDependencies": {
+    "@types/node": "24.0.15",
+    "@vishot/cli": "^0.2.0",
+    "tsx": "4.23.5",
+    "typescript": "7.0.2",
+    "vitest": "4.1.10"
+  },
+  "packageManager": "pnpm@11.18.0",
+  "engines": {
+    "node": ">=24"
+  }
+}

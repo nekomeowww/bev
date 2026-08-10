@@ -1,0 +1,30 @@
+name: Bev CI
+
+on:
+  pull_request:
+    paths:
+      - apps/bev/**
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+  push:
+    branches: [main]
+    paths:
+      - apps/bev/**
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @nekomeowww/bev typecheck
+      - run: pnpm --filter @nekomeowww/bev build

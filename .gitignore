@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+target/
+*.log
+apps/bev/out/
+apps/bev/bundle/
+apps/bev/flatpak/
+.vishot/

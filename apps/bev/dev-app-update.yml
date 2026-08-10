@@ -1,0 +1,6 @@
+provider: github
+owner: nekomeowww
+repo: cint
+updaterCacheDirName: bev-updater
+allowPrerelease: true
+channel: nightly

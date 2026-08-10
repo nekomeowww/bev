@@ -1,0 +1,220 @@
+:root {
+  color-scheme: light dark;
+  --font-ui: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", ui-monospace, monospace;
+  --ui-font-size: 13px;
+  --font-size-ui: var(--ui-font-size);
+  --font-size-ui-lg: calc(var(--ui-font-size) + 1px);
+  --font-size-ui-sm: calc(var(--ui-font-size) - 1px);
+  --font-size-ui-xs: calc(var(--ui-font-size) - 2px);
+  --font-size-ui-2xs: 10px;
+  --radius-panel: 16px;
+  --accent: #6e63ca;
+  --accent-border: #5c52ba;
+  --accent-soft: rgb(110 99 202 / 18%);
+  --accent-wash: rgb(110 99 202 / 8%);
+  --text-primary: #252428;
+  --text-secondary: #66636d;
+  --text-muted: #99959f;
+  --app-wash: rgb(168 168 168 / 25%);
+  --surface-panel: rgb(255 255 255 / 73%);
+  --surface-group: rgb(247 246 249 / 76%);
+  --surface-item: rgb(255 255 255 / 72%);
+  --surface-item-hover: rgb(255 255 255 / 92%);
+  --surface-input: rgb(255 255 255 / 68%);
+  --surface-popover: rgb(250 249 251 / 89%);
+  --surface-hover: rgb(66 61 74 / 7%);
+  --surface-selected: rgb(110 99 202 / 11%);
+  --surface-tab-open: rgb(255 255 255 / 38%);
+  --border-subtle: rgb(49 45 56 / 10%);
+  --border-strong: rgb(49 45 56 / 18%);
+  --border-selected: rgb(110 99 202 / 18%);
+  --grid-dot: rgb(189 187 193 / 16%);
+  --shadow-panel: 0 12px 30px rgb(24 21 29 / 7%), 0 1px 1px rgb(24 21 29 / 5%);
+  --shadow-card: 0 6px 18px rgb(24 21 29 / 6%);
+  --shadow-popover: 0 18px 50px rgb(20 17 26 / 18%), 0 2px 8px rgb(20 17 26 / 8%);
+  font-family: var(--font-ui);
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #9288e0;
+    --accent-border: #8277d3;
+    --accent-soft: rgb(146 136 224 / 20%);
+    --accent-wash: rgb(146 136 224 / 10%);
+    --text-primary: #eceaef;
+    --text-secondary: #aaa6b1;
+    --text-muted: #77727e;
+    --app-wash: rgb(10 9 18 / 50%);
+    --surface-panel: rgb(20 18 22 / 74%);
+    --surface-group: rgb(37 35 40 / 78%);
+    --surface-item: rgb(49 46 53 / 66%);
+    --surface-item-hover: rgb(58 54 63 / 82%);
+    --surface-input: rgb(17 16 19 / 45%);
+    --surface-popover: rgb(39 36 43 / 92%);
+    --surface-hover: rgb(255 255 255 / 6%);
+    --surface-selected: rgb(146 136 224 / 14%);
+    --surface-tab-open: rgb(255 255 255 / 5%);
+    --border-subtle: rgb(255 255 255 / 8%);
+    --border-strong: rgb(255 255 255 / 14%);
+    --border-selected: rgb(146 136 224 / 22%);
+    --grid-dot: rgb(255 255 255 / 10%);
+    --shadow-panel: 0 14px 34px rgb(0 0 0 / 20%), 0 1px 1px rgb(0 0 0 / 22%);
+    --shadow-card: 0 7px 22px rgb(0 0 0 / 16%);
+    --shadow-popover: 0 20px 60px rgb(0 0 0 / 42%), 0 2px 8px rgb(0 0 0 / 24%);
+  }
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+body {
+  color: var(--text-primary);
+  user-select: none;
+}
+
+/* Dockview owns structural layout CSS; these variables only map it to Bev's theme. */
+.bev-editor-theme,
+.bev-editor-theme .dockview-theme-light {
+  --dv-tabs-and-actions-container-height: 38px;
+  --dv-tabs-and-actions-container-font-size: var(--font-size-ui);
+  --dv-tab-font-size: var(--font-size-ui);
+  --dv-tab-margin: 0px 2px 0;
+  --dv-group-view-background-color: transparent;
+  --dv-tabs-and-actions-container-background-color: transparent;
+  --dv-activegroup-visiblepanel-tab-background-color: var(--surface-panel);
+  --dv-activegroup-hiddenpanel-tab-background-color: var(--surface-tab-open);
+  --dv-inactivegroup-visiblepanel-tab-background-color: var(--surface-item);
+  --dv-inactivegroup-hiddenpanel-tab-background-color: var(--surface-tab-open);
+  --dv-activegroup-visiblepanel-tab-color: var(--text-primary);
+  --dv-activegroup-hiddenpanel-tab-color: var(--text-muted);
+  --dv-inactivegroup-visiblepanel-tab-color: var(--text-secondary);
+  --dv-inactivegroup-hiddenpanel-tab-color: var(--text-muted);
+  --dv-tab-divider-color: transparent;
+  --dv-separator-border: var(--border-subtle);
+  --dv-sash-color: transparent;
+  --dv-active-sash-color: var(--accent);
+  --dv-icon-hover-background-color: var(--surface-hover);
+  --dv-drag-over-background-color: var(--accent-wash);
+  --dv-drag-over-border-color: var(--accent-border);
+  --dv-scrollbar-background-color: var(--border-strong);
+  --dv-floating-border: 1px solid var(--border-strong);
+  --dv-border-radius: 10px;
+  --dv-tab-border-radius: 12px 12px 0 0;
+  --dv-dropdown-border-radius: 12px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+}
+
+/* Dockview owns these internal elements, so its titlebar-to-view seam is themed here. */
+.bev-editor-theme .dv-tabs-and-actions-container {
+  align-items: stretch;
+  padding-right: 34px;
+}
+
+.bev-editor-theme .dv-tabs-container {
+  padding-left: 0;
+  transition: padding-left 200ms ease-out;
+}
+
+.bev-editor-theme .dv-tab {
+  min-width: 0;
+  padding: 0;
+  border-radius: var(--dv-tab-border-radius);
+  -webkit-app-region: no-drag;
+}
+
+.bev-editor-theme .dv-tabs-container > .dv-tab:first-child {
+  margin-left: 0;
+}
+
+.bev-app[data-sidebar-open="false"] .bev-editor-theme .dv-tabs-container {
+  padding-left: 40px;
+}
+
+.bev-app[data-platform="darwin"][data-sidebar-open="false"] .bev-editor-theme .dv-tabs-container {
+  padding-left: 110px;
+}
+
+.bev-editor-theme .dv-tabs-container > .dv-tab:last-child {
+  margin-right: 0;
+}
+
+.bev-editor-theme .dv-tab.dv-active-tab {
+  z-index: 2;
+  border: none;
+}
+
+.dv-groupview.dv-active-group > .dv-tabs-and-actions-container .dv-tabs-container > div.dv-tab.dv-active-tab {
+  background: var(--surface-panel);
+}
+
+.bev-editor-theme .dv-tab.dv-inactive-tab:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.bev-editor-theme .dv-tabs-container,
+.bev-editor-theme .dv-scrollable > .dv-tabs-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bev-editor-theme .dv-tabs-container {
+    transition: none;
+  }
+}
+
+.bev-editor-theme .dv-void-container {
+  -webkit-app-region: drag;
+}
+
+.bev-editor-theme .dv-groupview > .dv-content-container {
+  overflow: hidden;
+  border-radius: 12px;
+  border-top-left-radius: 0;
+  background: var(--surface-panel);
+}
+
+/* Always-rendered panels live in a Dockview overlay instead of the content node. */
+.bev-editor-theme .dv-render-overlay {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Dockview applies mouse focus outlines to the entire tab; buttons keep their own focus ring. */
+.bev-editor-theme .dv-tab:focus::after,
+.bev-editor-theme .dv-tab:focus-within::after,
+.bev-editor-theme .dv-content-container:focus {
+  outline: none !important;
+}
+
+.bev-editor-theme .dv-tab:focus-visible::after {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: -2px;
+  border-radius: var(--dv-tab-border-radius);
+}
+
+button,
+textarea {
+  -webkit-app-region: no-drag;
+}
+
+button {
+  cursor: default;
+}
+
+* {
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-width: thin;
+}

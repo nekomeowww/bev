@@ -1,0 +1,62 @@
+{
+  "name": "@nekomeowww/bev",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Bev desktop application",
+  "author": {
+    "name": "Nekomeowww",
+    "url": "https://github.com/nekomeowww"
+  },
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "start": "electron-vite preview",
+    "build": "electron-vite build",
+    "postinstall": "electron-builder install-app-deps",
+    "build:unpack": "pnpm run build && electron-builder --dir",
+    "build:win": "pnpm run build && electron-builder --win",
+    "build:mac": "pnpm run build && electron-builder --mac",
+    "build:linux": "pnpm run build && electron-builder --linux",
+    "rename-artifacts": "tsx scripts/rename-artifacts.ts",
+    "artifacts-metadata": "tsx scripts/artifacts-metadata.ts",
+    "regenerate-windows-latest": "tsx scripts/regenerate-windows-latest.ts",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@electron-toolkit/preload": "^3.0.2",
+    "@electron-toolkit/utils": "^4.0.0",
+    "@moeru/eventa": "1.0.0-beta.14",
+    "dockview-vue": "7.0.4",
+    "electron-updater": "6.7.3",
+    "injeca": "0.2.0",
+    "lucide": "^1.30.0",
+    "morphicons": "^1.6.0",
+    "reka-ui": "2.10.1",
+    "shiki": "^4.4.2",
+    "virtua": "0.50.1",
+    "vscode-jsonrpc": "9.0.1",
+    "vscode-languageserver-protocol": "3.18.2",
+    "vue": "3.5.32"
+  },
+  "devDependencies": {
+    "@iconify-json/mingcute": "^1.2.8",
+    "@types/node": "24.0.15",
+    "@vitejs/plugin-vue": "6.0.1",
+    "cac": "6.7.14",
+    "electron": "40.8.5",
+    "electron-builder": "26.8.1",
+    "electron-vite": "5.0.0",
+    "tsx": "4.23.5",
+    "typescript": "5.9.3",
+    "unocss": "^66.7.5",
+    "vite": "8.0.8",
+    "vite-plugin-vue-devtools": "^8.2.1",
+    "vue-tsc": "3.2.2",
+    "yaml": "2.8.3"
+  },
+  "build": {
+    "appId": "io.github.nekomeowww.bev",
+    "extends": "electron-builder.config.ts"
+  }
+}

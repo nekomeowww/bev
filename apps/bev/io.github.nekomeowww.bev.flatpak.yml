@@ -1,0 +1,41 @@
+app-id: io.github.nekomeowww.bev
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+base: org.electronjs.Electron2.BaseApp
+base-version: '24.08'
+command: bev.sh
+
+finish-args:
+  - --share=network
+  - --socket=x11
+  - --socket=wayland
+  - --device=all
+  - --socket=pulseaudio
+  - --socket=session-bus
+  - --share=ipc
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.freedesktop.portal.Desktop
+  - --filesystem=home:rw
+
+modules:
+  - name: Bev-App
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/bin/bev
+      - cp -r ./* /app/bin/bev/
+      - install bev.sh /app/bin/bev.sh
+      - chmod +x /app/bin/bev/bev
+    sources:
+      - type: dir
+        only-arches: [x86_64]
+        path: dist/linux-unpacked
+      - type: dir
+        only-arches: [aarch64]
+        path: dist/linux-arm64-unpacked
+      - type: script
+        dest-filename: bev.sh
+        commands:
+          - ulimit -c 0
+          - export TMPDIR="$XDG_RUNTIME_DIR/app/$FLATPAK_ID"
+          - exec zypak-wrapper /app/bin/bev/bev "$@"
