@@ -1,4 +1,4 @@
-# Cint contribution guide
+# Bev contribution guide
 
 These rules apply to the entire repository. A more specific `AGENTS.md` may refine them for its subtree.
 
@@ -59,6 +59,6 @@ These rules apply to the entire repository. A more specific `AGENTS.md` may refi
 
 ## Verification
 
-- Run `pnpm --filter @nekomeowww/bev typecheck` after Vue or TypeScript changes.
+- Run `pnpm --filter @bev-dev/bev-desktop typecheck` after Vue or TypeScript changes.
 - Run `pnpm test` for behavior changes covered by the repository test suite.
-- Run `pnpm --filter @nekomeowww/bev build` after UnoCSS configuration or class extraction changes.
+- Run `pnpm --filter @bev-dev/bev-desktop build` after UnoCSS configuration or class extraction changes.

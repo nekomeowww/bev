@@ -26,5 +26,5 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @nekomeowww/bev typecheck
-      - run: pnpm --filter @nekomeowww/bev build
+      - run: pnpm --filter @bev-dev/bev-desktop typecheck
+      - run: pnpm --filter @bev-dev/bev-desktop build

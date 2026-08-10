@@ -1,7 +1,8 @@
 {
-  "name": "@nekomeowww/cint",
+  "name": "@bev-dev/bev",
   "version": "0.0.0",
   "private": true,
+  "description": "Core LSP modules for Bev (Birdeye's View)",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

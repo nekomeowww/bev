@@ -23,7 +23,7 @@ export default {
   extraMetadata: {
     name: 'bev',
     main: 'out/main/index.js',
-    repository: 'https://github.com/nekomeowww/cint',
+    repository: 'https://github.com/nekomeowww/bev',
     license: 'MIT',
   },
   win: {
@@ -31,7 +31,7 @@ export default {
     publish: {
       provider: 'github',
       owner: 'nekomeowww',
-      repo: 'cint',
+      repo: 'bev',
       channel: 'latest-${arch}',
     },
   },
@@ -50,7 +50,7 @@ export default {
     publish: {
       provider: 'github',
       owner: 'nekomeowww',
-      repo: 'cint',
+      repo: 'bev',
       channel: 'latest-${arch}',
     },
     extendInfo: [
@@ -70,12 +70,12 @@ export default {
     publish: {
       provider: 'github',
       owner: 'nekomeowww',
-      repo: 'cint',
+      repo: 'bev',
       channel: 'latest-${arch}',
     },
     category: 'Utility',
-    synopsis: 'Bev desktop application.',
-    description: 'Bev is a cross-platform desktop application.',
+    synopsis: "Bev (Birdeye's View) desktop application.",
+    description: "Bev (Birdeye's View) is a cross-platform desktop application.",
     executableName: 'bev',
     artifactName: '${productName}-${version}-linux-${arch}.${ext}',
     icon: 'build/icon.png',

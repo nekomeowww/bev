@@ -5,5 +5,5 @@ Terminal=false
 Type=Application
 Icon=io.github.nekomeowww.bev
 StartupWMClass=Bev
-Comment=Bev desktop application
+Comment=Bev (Birdeye's View) desktop application
 Categories=Utility;

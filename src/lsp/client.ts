@@ -29,7 +29,7 @@ import type { DocumentHandle } from './documents.js'
 import type { LspSession } from './session.js'
 
 /**
- * Provides typed access to the standard LSP features currently used by cint.
+ * Provides typed access to the standard LSP features currently used by Bev.
  */
 export class LspClient {
   readonly #session: LspSession

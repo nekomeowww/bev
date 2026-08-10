@@ -1,13 +1,13 @@
-# cint
+# Bev
 
-An early experiment in hosting language servers outside an editor, with the
-long-term goal of building navigable semantic views of codebases.
+**Bev** stands for **Birdeye's View**. It hosts language servers outside an
+editor to build navigable semantic views of codebases.
 
-The repository also contains **Bev**, an Electron architecture canvas built on
-the reusable LSP modules. Bev keeps the rendered architecture as interactive
-Vue DOM on a pan/zoom world: this preserves native component behavior, keyboard
-focus, drag-and-drop, Reka UI menus and virtualized file navigation without
-making Vue Flow the document model.
+The repository contains reusable LSP modules and an Electron architecture
+canvas. Bev keeps the rendered architecture as interactive Vue DOM on a
+pan/zoom world: this preserves native component behavior, keyboard focus,
+drag-and-drop, Reka UI menus and virtualized file navigation without making Vue
+Flow the document model.
 
 ## Architecture
 
@@ -16,7 +16,7 @@ The reusable code is deliberately split into four focused modules:
 - `LspSession` owns one server process, JSON-RPC connection, initialization,
   server-initiated requests, capabilities and shutdown.
 - `DocumentManager` owns open-document text, versions and synchronization.
-- `LspClient` exposes typed standard LSP queries as cint needs them.
+- `LspClient` exposes the typed standard LSP queries Bev needs.
 - `RustAnalyzerAdapter` hides rust-analyzer launch and configuration details.
 
 Raw requests and notifications remain available for language-server extensions,
@@ -34,7 +34,7 @@ import {
   DocumentManager,
   LspClient,
   RustAnalyzerAdapter,
-} from '@nekomeowww/cint'
+} from '@bev-dev/bev'
 
 const workspaceRoot = '/absolute/path/to/rust-project'
 const session = new RustAnalyzerAdapter().createSession(workspaceRoot)
@@ -70,7 +70,7 @@ pnpm build
 Run the desktop architecture canvas:
 
 ```bash
-pnpm --filter @nekomeowww/bev dev
+pnpm --filter @bev-dev/bev-desktop dev
 ```
 
 The supported server executables are discovered from `PATH`: `rust-analyzer`,

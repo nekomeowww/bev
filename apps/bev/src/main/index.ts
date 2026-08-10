@@ -39,7 +39,7 @@ app.whenReady().then(async () => {
     dependsOn: { mainWindow, workspace },
     callback: async ({ mainWindow, workspace }) => {
       getMainWindow = mainWindow
-      const initialWorkspace = process.env.CINT_WORKSPACE?.trim()
+      const initialWorkspace = process.env.BEV_WORKSPACE?.trim()
         || (process.env.ELECTRON_RENDERER_URL
           ? resolve(import.meta.dirname, '../../../..')
           : undefined)

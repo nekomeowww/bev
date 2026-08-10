@@ -16,7 +16,7 @@ const loadingDocuments = new Set()
 const readyDocuments = new Set()
 
 connection.onRequest('initialize', () => {
-  if (process.env.CINT_FAKE_INITIALIZE_ERROR === '1')
+  if (process.env.BEV_FAKE_INITIALIZE_ERROR === '1')
     throw new Error('fixture initialize failure')
 
   return {
@@ -37,7 +37,7 @@ connection.onRequest('initialize', () => {
       typeDefinitionProvider: true,
     },
     serverInfo: {
-      name: 'cint-fake-lsp',
+      name: 'bev-fake-lsp',
       version: '0.0.0',
     },
   }
@@ -62,7 +62,7 @@ connection.onNotification('textDocument/didOpen', ({ textDocument }) => {
       },
       severity: 2,
       message: 'fixture diagnostic',
-      source: 'cint-fake-lsp',
+      source: 'bev-fake-lsp',
     }],
   })
 })

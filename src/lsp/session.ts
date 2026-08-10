@@ -165,7 +165,7 @@ export class LspSession {
       const params: InitializeParams = {
         processId: process.pid,
         clientInfo: {
-          name: this.#options.clientName === undefined ? 'cint' : this.#options.clientName,
+          name: this.#options.clientName === undefined ? 'bev' : this.#options.clientName,
           version: this.#options.clientVersion === undefined ? '0.0.0' : this.#options.clientVersion,
         },
         rootUri: this.#workspaceFolder.uri,
@@ -285,7 +285,7 @@ export class LspSession {
       case 'workspace/applyEdit': {
         const result: ApplyWorkspaceEditResult = {
           applied: false,
-          failureReason: 'cint is read-only in the first prototype',
+          failureReason: 'Bev is read-only in the first prototype',
         }
         return result
       }
@@ -302,7 +302,7 @@ export class LspSession {
       default:
         throw new ResponseError(
           ErrorCodes.MethodNotFound,
-          `cint does not implement server request ${method}`,
+          `Bev does not implement server request ${method}`,
         )
     }
   }

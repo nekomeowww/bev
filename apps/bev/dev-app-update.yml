@@ -1,6 +1,6 @@
 provider: github
 owner: nekomeowww
-repo: cint
+repo: bev
 updaterCacheDirName: bev-updater
 allowPrerelease: true
 channel: nightly

@@ -227,7 +227,7 @@ function createWorkspaceService(): WorkspaceService {
 }
 
 async function createRustWorkspace(name: string): Promise<string> {
-  const parent = await mkdtemp(join(tmpdir(), 'cint-workspace-'))
+  const parent = await mkdtemp(join(tmpdir(), 'bev-workspace-'))
   temporaryDirectories.push(parent)
   const rootPath = join(parent, name)
   await mkdir(join(rootPath, 'src'), { recursive: true })
@@ -239,7 +239,7 @@ async function createRustWorkspace(name: string): Promise<string> {
 }
 
 async function createNestedRustWorkspace(name: string): Promise<string> {
-  const parent = await mkdtemp(join(tmpdir(), 'cint-workspace-'))
+  const parent = await mkdtemp(join(tmpdir(), 'bev-workspace-'))
   temporaryDirectories.push(parent)
   const rootPath = join(parent, name)
   const memberPath = join(rootPath, 'crates/member')

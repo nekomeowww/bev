@@ -66,7 +66,7 @@ describe('LspSession', () => {
     const session = new LspSession({
       workspaceRoot: process.cwd(),
       server: {
-        command: 'cint-language-server-that-does-not-exist',
+        command: 'bev-language-server-that-does-not-exist',
       },
     })
 
@@ -87,7 +87,7 @@ describe('LspSession', () => {
       server: {
         command: process.execPath,
         args: [fakeServerPath],
-        env: { CINT_FAKE_INITIALIZE_ERROR: '1' },
+        env: { BEV_FAKE_INITIALIZE_ERROR: '1' },
       },
     })
 
