@@ -7,6 +7,8 @@ import {
 } from 'reka-ui'
 import { shallowRef } from 'vue'
 
+import IconButton from '../../ui/IconButton.vue'
+
 const open = shallowRef(false)
 
 const props = defineProps<{
@@ -26,17 +28,10 @@ function updateFontSize(event: Event): void {
 <template>
   <PopoverRoot v-model:open="open">
     <PopoverTrigger as-child>
-      <button
-        :class="[
-          'inline-flex size-7 items-center justify-center p-0',
-          'border border-[var(--border-subtle)] rounded-lg',
-          'bg-[var(--surface-item)] text-[var(--text-secondary)] shadow-sm backdrop-blur-xl',
-          'transition-colors hover:bg-[var(--surface-item-hover)] hover:text-[var(--text-primary)]',
-          'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
-        ]"
-        type="button"
-        aria-label="Open interface settings"
+      <IconButton
+        label="Open interface settings"
         title="Interface settings"
+        surface="raised"
       >
         <div
           aria-hidden="true"
@@ -45,7 +40,7 @@ function updateFontSize(event: Event): void {
             open ? 'i-mingcute:settings-3-fill' : 'i-mingcute:settings-3-line',
           ]"
         />
-      </button>
+      </IconButton>
     </PopoverTrigger>
 
     <PopoverPortal>

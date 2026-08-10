@@ -1,9 +1,20 @@
-import { app } from 'electron'
+import { app, protocol } from 'electron'
 import { injeca, lifecycle } from 'injeca'
-import { resolve } from 'node:path'
+import { join, resolve } from 'node:path'
 
+import { FileIconThemeService, fileIconResourceScheme } from './services/file-icon-theme.js'
 import { WorkspaceService } from './services/workspace.js'
 import { createMainWindow } from './windows/main.js'
+
+protocol.registerSchemesAsPrivileged([{
+  scheme: fileIconResourceScheme,
+  privileges: {
+    standard: true,
+    secure: true,
+    supportFetchAPI: true,
+    corsEnabled: true,
+  },
+}])
 
 const remoteDebugPort = process.env.BEV_REMOTE_DEBUG_PORT?.trim()
 if (remoteDebugPort)
@@ -22,14 +33,17 @@ app.whenReady().then(async () => {
       return service
     },
   })
+  const fileIconThemes = injeca.provide('services:file-icon-themes', () => new FileIconThemeService({
+    cacheRoot: join(app.getPath('userData'), 'file-icon-themes'),
+  }))
 
   const mainWindow = injeca.provide('windows:main', {
-    dependsOn: { electronApp, workspace },
+    dependsOn: { electronApp, fileIconThemes, workspace },
     build: ({ dependsOn }) => {
       let window: Electron.BrowserWindow | undefined
       return () => {
         if (!window || window.isDestroyed())
-          window = createMainWindow(dependsOn.workspace)
+          window = createMainWindow(dependsOn.workspace, dependsOn.fileIconThemes)
         return window
       }
     },

@@ -3,6 +3,8 @@ import type { OutlineState, WorkspaceState } from '../workspace/state'
 
 import { computed } from 'vue'
 
+import Button from '../../ui/Button.vue'
+
 import { currentWorkspace } from '../workspace/state'
 
 const props = defineProps<{
@@ -58,13 +60,12 @@ const diagnosticCount = computed(() => {
     aria-label="Workspace status"
   >
     <div class="flex min-w-0 items-center gap-1">
-      <button
+      <Button
         :class="[
-          'flex h-5 min-w-0 items-center gap-1.5 px-1.5 border-0 rounded-md bg-transparent',
+          'flex h-5 min-w-0 items-center gap-1.5 rounded-md bg-transparent px-1.5',
           'text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
           'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
         ]"
-        type="button"
         aria-label="Switch workspace"
         title="Switch workspace"
         @click="emit('openWorkspace')"
@@ -72,7 +73,7 @@ const diagnosticCount = computed(() => {
         <div aria-hidden="true" class="i-mingcute:git-branch-line size-3" />
         <span class="max-w-44 truncate">{{ workspaceLabel }}</span>
         <div aria-hidden="true" class="i-mingcute:unfold-vertical-line size-2.5" />
-      </button>
+      </Button>
       <span v-if="activePath" class="max-w-72 truncate px-1 text-[var(--text-muted)]">
         {{ activePath }}
       </span>

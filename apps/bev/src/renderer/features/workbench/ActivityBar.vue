@@ -1,28 +1,77 @@
+<script setup lang="ts">
+import { TabsIndicator, TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
+
+import IconButton from '../../ui/IconButton.vue'
+
+export type WorkbenchSidebarView = 'explorer' | 'extensions'
+
+const props = defineProps<{
+  activeView: WorkbenchSidebarView
+}>()
+
+const emit = defineEmits<{
+  selectView: [view: WorkbenchSidebarView]
+}>()
+
+function selectView(value: string | number): void {
+  if (value === 'explorer' || value === 'extensions')
+    emit('selectView', value)
+}
+</script>
+
 <template>
-  <nav
-    :class="[
-      'window-no-drag flex h-9 items-center gap-0.5 px-1.5',
-      'text-[var(--text-muted)]',
-    ]"
-    aria-label="Workspace tools"
+  <TabsRoot
+    :model-value="props.activeView"
+    class="window-no-drag shrink-0"
+    @update:model-value="selectView"
   >
-    <button
+    <TabsList
       :class="[
-        'relative inline-flex size-7 items-center justify-center border-0 rounded-lg bg-transparent p-0',
-        'bg-[var(--surface-selected)] text-[var(--text-primary)] transition-colors',
-        'hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
-        'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
+        'relative flex h-9 items-center gap-0.5 px-1.5',
+        'text-[var(--text-muted)]',
       ]"
-      type="button"
-      aria-label="File Explorer"
-      title="File Explorer"
-      aria-current="page"
+      aria-label="Workspace tools"
     >
-      <div aria-hidden="true" class="i-mingcute:folders-fill size-3.5" />
-      <span
-        aria-hidden="true"
-        class="absolute inset-x-1 bottom-0 h-0.5 rounded-full bg-[var(--accent)]"
-      />
-    </button>
-  </nav>
+      <TabsIndicator
+        :class="[
+          'pointer-events-none absolute bottom-0 left-0 h-0.5',
+          'w-[var(--reka-tabs-indicator-size)] translate-x-[var(--reka-tabs-indicator-position)]',
+          'transition-[width,transform] duration-200 ease-out motion-reduce:transition-none',
+        ]"
+      >
+        <span class="mx-1 block h-full rounded-full bg-[var(--accent)]" />
+      </TabsIndicator>
+
+      <TabsTrigger value="explorer" as-child>
+        <IconButton
+          label="File Explorer"
+          :aria-current="props.activeView === 'explorer' ? 'page' : undefined"
+        >
+          <div
+            aria-hidden="true"
+            :class="[
+              'i-mingcute:folders-fill size-3.5',
+              props.activeView === 'explorer' ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]',
+            ]"
+          />
+        </IconButton>
+      </TabsTrigger>
+
+      <TabsTrigger value="extensions" as-child>
+        <IconButton
+          label="Extensions"
+          :aria-current="props.activeView === 'extensions' ? 'page' : undefined"
+        >
+          <div
+            aria-hidden="true"
+            :class="[
+              'size-3.5',
+              props.activeView === 'extensions' ? 'i-mingcute:plugin-2-fill' : 'i-mingcute:plugin-2-line',
+              props.activeView === 'extensions' ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]',
+            ]"
+          />
+        </IconButton>
+      </TabsTrigger>
+    </TabsList>
+  </TabsRoot>
 </template>

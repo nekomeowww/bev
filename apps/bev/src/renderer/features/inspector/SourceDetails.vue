@@ -5,6 +5,8 @@ import type { ThemedToken } from 'shiki'
 
 import { computed, onScopeDispose, shallowRef, watch } from 'vue'
 
+import Button from '../../ui/Button.vue'
+import ToolbarButton from '../../ui/ToolbarButton.vue'
 import { useBevDockContext } from '../dock/context'
 
 interface SourceLine {
@@ -147,19 +149,14 @@ onScopeDispose(() => colorSchemeQuery.removeEventListener('change', onColorSchem
       >
         Pinned
       </span>
-      <button
-        :class="[
-          'inline-flex size-6 items-center justify-center border-0 rounded-md bg-transparent p-0',
-          'text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
-          'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
-        ]"
-        type="button"
-        aria-label="Close source details"
-        title="Close source details"
+      <ToolbarButton
+        class="text-[var(--text-muted)]"
+        label="Close source details"
+        size="sm"
         @click="workspace.closeDetails"
       >
         <div aria-hidden="true" class="i-mingcute:close-line size-3.5" />
-      </button>
+      </ToolbarButton>
     </header>
 
     <div class="min-h-0 flex-1 overflow-auto p-2.5">
@@ -207,24 +204,23 @@ onScopeDispose(() => colorSchemeQuery.removeEventListener('change', onColorSchem
           <span class="ml-auto tabular-nums">{{ group.items.length }}</span>
         </header>
         <div class="flex flex-col gap-0.5">
-          <button
+          <Button
             v-for="item in group.items"
             :key="`${item.path}:${item.range.start.line}:${item.range.start.character}`"
             :class="[
-              'flex min-h-7 min-w-0 items-center gap-1.5 px-2 border-0 rounded-md bg-transparent',
+              'flex min-h-7 min-w-0 items-center gap-1.5 rounded-md bg-transparent px-2',
               'text-left [font-size:var(--font-size-ui-2xs)] text-[var(--text-secondary)]',
               'hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
               'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
               item.external && 'opacity-45',
             ]"
-            type="button"
             :disabled="item.external"
             :title="item.external ? 'External reference' : `Open ${formatReference(item)}`"
             @click="workspace.openSourceReference(item)"
           >
             <div aria-hidden="true" class="i-mingcute:corner-down-right-line size-3 shrink-0" />
             <span class="truncate">{{ formatReference(item) }}</span>
-          </button>
+          </Button>
         </div>
       </section>
 

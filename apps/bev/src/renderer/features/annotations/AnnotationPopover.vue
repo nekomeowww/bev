@@ -9,6 +9,9 @@ import {
 } from 'reka-ui'
 import { computed, shallowRef, watch } from 'vue'
 
+import ActionButton from '../../ui/ActionButton.vue'
+import Button from '../../ui/Button.vue'
+import IconButton from '../../ui/IconButton.vue'
 import { readContextDrag } from '../workspace/model'
 
 const props = defineProps<{
@@ -99,19 +102,12 @@ function formatReference(reference: ContextReference): string {
       >
         <header class="flex h-7.5 items-center justify-between px-1 pb-1.25 [font-size:var(--font-size-ui-sm)] text-[var(--text-secondary)] font-620">
           <span>{{ targets.length }} selected</span>
-          <button
-            :class="[
-              'inline-flex size-7 items-center justify-center border-0 rounded-lg bg-transparent p-0',
-              'text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]',
-              'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
-            ]"
-            type="button"
-            aria-label="Copy annotation context"
-            title="Copy annotation context"
+          <IconButton
+            label="Copy annotation context"
             @click="copyContext"
           >
             <div aria-hidden="true" class="i-mingcute:copy-2-line size-3.5" />
-          </button>
+          </IconButton>
         </header>
 
         <div class="mb-2 flex max-h-15 flex-wrap gap-1.25 overflow-auto">
@@ -159,16 +155,15 @@ function formatReference(reference: ContextReference): string {
           @drop.prevent="handleDrop"
         >
           <div v-if="context.length" class="flex flex-wrap gap-1.25">
-            <button
+            <Button
               v-for="reference in context"
               :key="reference.id"
               :class="[
-                'inline-flex h-6.25 min-w-0 items-center gap-1.25 px-1.75',
-                'border border-[var(--border-subtle)] rounded-lg bg-[var(--surface-item)]',
+                'inline-flex h-6.25 min-w-0 items-center gap-1.25 rounded-lg px-1.75',
+                'bg-[var(--surface-item)]',
                 '[font-size:var(--font-size-ui-xs)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]',
                 'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
               ]"
-              type="button"
               :aria-label="`Remove ${reference.label} from context`"
               :title="`Remove ${reference.label}`"
               @click="emit('removeContext', reference.id)"
@@ -180,36 +175,25 @@ function formatReference(reference: ContextReference): string {
               />
               {{ reference.label }}
               <div aria-hidden="true" class="i-mingcute:close-line size-3 shrink-0 text-[var(--text-muted)]" />
-            </button>
+            </Button>
           </div>
           <span v-else class="flex min-h-6.5 items-center justify-center">Drop files or symbols here</span>
         </div>
 
         <footer class="flex items-center justify-end gap-1.5 pt-2">
-          <button
-            :class="[
-              'h-7.25 px-2.5 border border-[var(--border-subtle)] rounded-lg',
-              'bg-[var(--surface-item)] [font-size:var(--font-size-ui-sm)] text-[var(--text-secondary)] font-560',
-              'hover:bg-[var(--surface-hover)] focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
-            ]"
-            type="button"
+          <ActionButton
+            tone="neutral"
             @click="emit('close')"
           >
             Cancel
-          </button>
-          <button
-            :class="[
-              'h-7.25 px-2.5 border border-[var(--accent-border)] rounded-lg',
-              'bg-[var(--accent)] [font-size:var(--font-size-ui-sm)] text-white font-560',
-              'focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2',
-              'disabled:cursor-default disabled:opacity-42',
-            ]"
-            type="button"
+          </ActionButton>
+          <ActionButton
+            tone="primary"
             :disabled="!canSave"
             @click="emit('save', note)"
           >
             Add
-          </button>
+          </ActionButton>
         </footer>
       </PopoverContent>
     </PopoverPortal>

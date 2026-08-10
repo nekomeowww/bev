@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ContextReference } from './features/workspace/model'
+import type { OpenVsxFileIconThemeItem } from '../shared/file-icons'
 
 import { computed, shallowRef, watch } from 'vue'
 
@@ -7,19 +8,29 @@ import AnnotationPopover from './features/annotations/AnnotationPopover.vue'
 import { useAnnotations } from './features/annotations/useAnnotations'
 import { provideBevDockContext } from './features/dock/context'
 import EditorHost from './features/editor/EditorHost.vue'
+import ExtensionDetailView from './features/extensions/ExtensionDetailView.vue'
+import ExtensionsSidebar from './features/extensions/ExtensionsSidebar.vue'
+import { provideFileIconTheme, useFileIconTheme } from './features/file-icons/useFileIconTheme'
 import StableInspector from './features/inspector/StableInspector.vue'
 import SettingsPopover from './features/settings/SettingsPopover.vue'
 import { useUiPreferences } from './features/settings/useUiPreferences'
 import ActivityBar from './features/workbench/ActivityBar.vue'
+import type { WorkbenchSidebarView } from './features/workbench/ActivityBar.vue'
 import StatusBar from './features/workbench/StatusBar.vue'
 import WorkspaceSidebar from './features/workspace/WorkspaceSidebar.vue'
 import { useWorkspace } from './features/workspace/useWorkspace'
+import Button from './ui/Button.vue'
+import IconButton from './ui/IconButton.vue'
 
 const workspace = useWorkspace()
 const annotations = useAnnotations()
+const fileIcons = useFileIconTheme()
 const uiPreferences = useUiPreferences()
 const annotationMode = shallowRef(false)
 const sidebarVisible = shallowRef(true)
+const sidebarView = shallowRef<WorkbenchSidebarView>('explorer')
+const extensionsVisited = shallowRef(false)
+const selectedExtension = shallowRef<OpenVsxFileIconThemeItem | null>(null)
 const platform = window.bev.platform
 const minimumSidebarWidth = 180
 const maximumSidebarWidth = 480
@@ -91,6 +102,17 @@ function readSidebarWidth(): number {
   return Number.isFinite(width) ? clampSidebarWidth(width) : defaultSidebarWidth
 }
 
+function selectSidebarView(view: WorkbenchSidebarView): void {
+  sidebarView.value = view
+  sidebarVisible.value = true
+  if (view === 'extensions')
+    extensionsVisited.value = true
+}
+
+function selectExtension(item: OpenVsxFileIconThemeItem): void {
+  selectedExtension.value = item
+}
+
 function beginAnnotation(
   references: ContextReference[],
   point: { x: number, y: number },
@@ -125,6 +147,7 @@ provideBevDockContext({
   beginAnnotation,
   addContext,
 })
+provideFileIconTheme(fileIcons)
 
 watch(
   () => workspace.workspace.value?.rootPath,
@@ -154,18 +177,14 @@ watch(sidebarWidth, width => localStorage.setItem(sidebarWidthStorageKey, String
       class="window-drag-region absolute inset-x-0 top-0 h-[38px]"
     />
 
-    <button
+    <IconButton
       :class="[
-        'window-no-drag absolute z-70 inline-flex size-7 items-center justify-center border-0 rounded-lg bg-transparent p-0',
-        'text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
-        'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
+        'window-no-drag absolute z-70',
         platform === 'darwin' ? 'left-19 top-1.5' : 'left-2 top-1.25',
       ]"
-      type="button"
+      :label="sidebarVisible ? 'Collapse sidebar' : 'Expand sidebar'"
       aria-controls="workspace-sidebar"
       :aria-expanded="sidebarVisible"
-      :aria-label="sidebarVisible ? 'Collapse sidebar' : 'Expand sidebar'"
-      :title="sidebarVisible ? 'Collapse sidebar' : 'Expand sidebar'"
       @click="sidebarVisible = !sidebarVisible"
     >
       <div
@@ -175,11 +194,11 @@ watch(sidebarWidth, width => localStorage.setItem(sidebarWidthStorageKey, String
           sidebarVisible ? 'i-mingcute:layout-leftbar-close-line' : 'i-mingcute:layout-left-line',
         ]"
       />
-    </button>
+    </IconButton>
 
     <aside
       id="workspace-sidebar"
-      class="pointer-events-none col-start-1 row-span-2 min-h-0 min-w-0 overflow-hidden"
+      class="pointer-events-none col-start-1 row-span-2 row-start-1 min-h-0 min-w-0 overflow-hidden"
       :aria-hidden="!sidebarVisible"
     >
       <div
@@ -194,15 +213,47 @@ watch(sidebarWidth, width => localStorage.setItem(sidebarWidthStorageKey, String
         :inert="!sidebarVisible"
       >
         <div class="h-[38px] shrink-0" />
-        <ActivityBar class="shrink-0" />
-        <WorkspaceSidebar
-          class="min-h-0 flex-1"
-          :state="workspace.workspaceState.value"
-          :outline-state="workspace.outlineState.value"
-          @open-workspace="workspace.openWorkspace()"
-          @select-file="workspace.openFile"
-          @add-context="addContext"
+        <ActivityBar
+          class="shrink-0"
+          :active-view="sidebarView"
+          @select-view="selectSidebarView"
         />
+        <div class="relative min-h-0 flex-1 overflow-hidden">
+          <Transition
+            enter-active-class="transition-[opacity,transform] duration-150 ease-out motion-reduce:transition-none"
+            enter-from-class="opacity-0 -translate-x-1"
+            enter-to-class="opacity-100 translate-x-0"
+            leave-active-class="transition-[opacity,transform] duration-100 ease-in motion-reduce:transition-none"
+            leave-from-class="opacity-100 translate-x-0"
+            leave-to-class="opacity-0 -translate-x-1"
+          >
+            <WorkspaceSidebar
+              v-show="sidebarView === 'explorer'"
+              class="absolute inset-0"
+              :state="workspace.workspaceState.value"
+              :outline-state="workspace.outlineState.value"
+              @open-workspace="workspace.openWorkspace()"
+              @select-file="workspace.openFile"
+              @add-context="addContext"
+            />
+          </Transition>
+          <Transition
+            enter-active-class="transition-[opacity,transform] duration-150 ease-out motion-reduce:transition-none"
+            enter-from-class="opacity-0 translate-x-1"
+            enter-to-class="opacity-100 translate-x-0"
+            leave-active-class="transition-[opacity,transform] duration-100 ease-in motion-reduce:transition-none"
+            leave-from-class="opacity-100 translate-x-0"
+            leave-to-class="opacity-0 translate-x-1"
+          >
+            <ExtensionsSidebar
+              v-if="extensionsVisited"
+              v-show="sidebarView === 'extensions'"
+              class="absolute inset-0"
+              :selected-item="selectedExtension"
+              @select="selectExtension"
+            />
+          </Transition>
+        </div>
       </div>
     </aside>
 
@@ -242,10 +293,36 @@ watch(sidebarWidth, width => localStorage.setItem(sidebarWidthStorageKey, String
       :class="[
         'relative col-start-3 row-span-2 row-start-1 min-h-0 min-w-0 overflow-hidden',
       ]"
-      aria-label="Editor area"
+      :aria-label="sidebarView === 'extensions' ? 'Extension details' : 'Editor area'"
     >
-      <EditorHost />
-      <StableInspector :open="workspace.detailReference.value !== null" />
+      <Transition
+        enter-active-class="transition-[opacity,transform] duration-180 ease-out motion-reduce:transition-none"
+        enter-from-class="opacity-0 translate-y-1"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition-opacity duration-100 ease-in motion-reduce:transition-none"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-show="sidebarView === 'explorer'" class="absolute inset-0">
+          <EditorHost />
+          <StableInspector :open="workspace.detailReference.value !== null" />
+        </div>
+      </Transition>
+      <Transition
+        enter-active-class="transition-[opacity,transform] duration-180 ease-out motion-reduce:transition-none"
+        enter-from-class="opacity-0 translate-y-1"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition-opacity duration-100 ease-in motion-reduce:transition-none"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <ExtensionDetailView
+          v-if="extensionsVisited"
+          v-show="sidebarView === 'extensions'"
+          class="absolute inset-0 z-10"
+          :item="selectedExtension"
+        />
+      </Transition>
     </section>
 
     <div class="window-no-drag absolute right-2 top-1.25 z-70">
@@ -256,28 +333,28 @@ watch(sidebarWidth, width => localStorage.setItem(sidebarWidthStorageKey, String
     </div>
 
     <StatusBar
+      class="row-start-3"
       :workspace-state="workspace.workspaceState.value"
       :outline-state="workspace.outlineState.value"
       :active-path="workspace.activePath.value"
       @open-workspace="workspace.openWorkspace()"
     />
 
-    <button
+    <Button
       v-if="annotations.annotations.value.length"
       :class="[
         'absolute bottom-7 right-2 z-50 flex h-6 items-center gap-1 px-2',
-        'border border-[var(--border-strong)] rounded-lg',
+        'rounded-lg',
         'bg-[var(--surface-popover)] [font-size:var(--font-size-ui-2xs)] text-[var(--text-secondary)] shadow-sm backdrop-blur-xl',
         'font-[var(--font-mono)] focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
       ]"
-      type="button"
       aria-label="Copy all annotations"
       title="Copy all annotations"
       @click="copySavedAnnotations"
     >
       <div aria-hidden="true" class="i-mingcute:copy-2-line size-3" />
       {{ annotations.annotations.value.length }}
-    </button>
+    </Button>
 
     <AnnotationPopover
       :open="annotations.open.value"

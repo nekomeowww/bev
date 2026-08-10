@@ -5,6 +5,8 @@ import type { OutlineState } from '../workspace/state'
 
 import { computed, reactive, shallowRef, useTemplateRef } from 'vue'
 
+import ActionButton from '../../ui/ActionButton.vue'
+import ToolbarButton from '../../ui/ToolbarButton.vue'
 import { symbolReference } from '../workspace/model'
 import { outlineStatusMessage } from '../workspace/state'
 import { rendererForLanguage } from './renderers'
@@ -224,20 +226,15 @@ function clamp(value: number, min: number, max: number): number {
           ]"
         />
         <span>{{ statusMessage }}</span>
-        <button
+        <ActionButton
           v-if="state.status === 'ready'"
-          :class="[
-            'mt-1 inline-flex h-7 items-center gap-1.5 px-2.5 border border-[var(--border-subtle)] rounded-lg',
-            'bg-[var(--surface-item)] [font-size:var(--font-size-ui-xs)] text-[var(--text-secondary)]',
-            'hover:bg-[var(--surface-item-hover)] hover:text-[var(--text-primary)]',
-            'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
-          ]"
-          type="button"
+          class="mt-1"
+          tone="neutral"
           @click="emit('retry')"
         >
           <div aria-hidden="true" class="i-mingcute:refresh-2-line size-3" />
           Retry outline
-        </button>
+        </ActionButton>
       </div>
 
       <div
@@ -260,16 +257,9 @@ function clamp(value: number, min: number, max: number): number {
         role="toolbar"
         aria-label="Canvas tools"
       >
-        <button
-          :class="[
-            'inline-flex size-7 items-center justify-center border-0 rounded-md bg-transparent p-0',
-            'text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
-            'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
-            annotationMode && 'bg-[var(--surface-selected)] text-[var(--accent)]',
-          ]"
-          type="button"
-          aria-label="Annotate symbols"
-          title="Annotate symbols"
+        <ToolbarButton
+          label="Annotate symbols"
+          :active="annotationMode"
           :aria-pressed="annotationMode"
           @click="emit('updateAnnotationMode', !annotationMode)"
         >
@@ -280,20 +270,13 @@ function clamp(value: number, min: number, max: number): number {
               annotationMode ? 'i-mingcute:search-ai-fill' : 'i-mingcute:search-ai-line',
             ]"
           />
-        </button>
-        <button
-          :class="[
-            'inline-flex size-7 items-center justify-center border-0 rounded-md bg-transparent p-0',
-            'text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
-            'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
-          ]"
-          type="button"
-          aria-label="Reset canvas position"
-          title="Reset canvas position"
+        </ToolbarButton>
+        <ToolbarButton
+          label="Reset canvas position"
           @click="resetCamera"
         >
           <div aria-hidden="true" class="i-mingcute:aiming-line size-3.5" />
-        </button>
+        </ToolbarButton>
       </div>
 
       <div

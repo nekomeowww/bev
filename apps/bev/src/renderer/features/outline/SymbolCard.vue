@@ -14,6 +14,8 @@ import { ChevronDown, ChevronRight } from 'lucide'
 import { MorphIcon } from 'morphicons/vue'
 import { computed, shallowRef } from 'vue'
 
+import IconButton from '../../ui/IconButton.vue'
+
 import { symbolReference, writeContextDrag } from '../workspace/model'
 
 const props = defineProps<{
@@ -107,15 +109,11 @@ function forwardAnnotation(nextReference: ContextReference, point: { x: number, 
             'flex min-h-10 min-w-0 items-center gap-2 px-2 py-1',
           ]"
         >
-          <button
+          <IconButton
             v-if="symbol.children.length"
-            :class="[
-              'inline-flex size-5 shrink-0 items-center justify-center border-0 rounded bg-transparent p-0',
-              'text-[var(--text-muted)] hover:bg-[var(--surface-hover)]',
-              'focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
-            ]"
-            type="button"
-            :aria-label="collapsed ? `Expand ${symbol.name}` : `Collapse ${symbol.name}`"
+            class="text-[var(--text-muted)]"
+            size="xs"
+            :label="collapsed ? `Expand ${symbol.name}` : `Collapse ${symbol.name}`"
             @click.stop="collapsed = !collapsed"
           >
             <MorphIcon
@@ -123,7 +121,7 @@ function forwardAnnotation(nextReference: ContextReference, point: { x: number, 
               :icon="collapsed ? ChevronRight : ChevronDown"
               reduced-motion="user"
             />
-          </button>
+          </IconButton>
           <span v-else aria-hidden="true" class="size-5 shrink-0" />
 
           <span

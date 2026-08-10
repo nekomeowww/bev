@@ -16,6 +16,10 @@ import { MorphIcon } from 'morphicons/vue'
 import { computed, shallowRef } from 'vue'
 import { VList } from 'virtua/vue'
 
+import ActionButton from '../../ui/ActionButton.vue'
+import Button from '../../ui/Button.vue'
+import FileIcon from '../file-icons/FileIcon.vue'
+import { useFileIconThemeContext } from '../file-icons/useFileIconTheme'
 import { fileReference, writeContextDrag } from './model'
 import { currentWorkspace, selectedOutlinePath } from './state'
 
@@ -31,6 +35,7 @@ const emit = defineEmits<{
 }>()
 
 const expandedPaths = shallowRef(new Set<string>())
+const fileIcons = useFileIconThemeContext()
 
 const snapshot = computed(() => currentWorkspace(props.state))
 const entries = computed(() => {
@@ -101,15 +106,16 @@ function flattenEntries(
     >
       <ContextMenuRoot :key="item.path">
         <ContextMenuTrigger as-child>
-          <button
+          <Button
             :class="[
               'grid h-7.5 w-max min-w-full grid-cols-[14px_17px_max-content_8px] items-center gap-1.25 pr-2',
-              'border-0 rounded-lg bg-transparent text-left text-[var(--text-primary)]',
+              'rounded-lg text-left text-[var(--text-primary)]',
               'hover:bg-[var(--surface-hover)] focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
-              item.path === selectedPath && 'bg-[var(--surface-selected)] shadow-[inset_0_0_0_1px_var(--border-selected)]',
+              item.path === selectedPath
+                ? 'bg-[var(--surface-selected)]'
+                : 'bg-transparent',
             ]"
             :style="{ paddingLeft: `${10 + item.depth * 14}px` }"
-            type="button"
             role="treeitem"
             :aria-level="item.depth + 1"
             :aria-expanded="item.kind === 'directory' ? item.expanded : undefined"
@@ -120,19 +126,18 @@ function flattenEntries(
             <MorphIcon
               :class="[
                 'size-[13px] text-[var(--text-muted)]',
-                item.kind === 'file' && 'invisible',
+                (item.kind === 'file' || fileIcons.hidesExplorerArrows.value) && 'invisible',
               ]"
               :icon="item.expanded ? ChevronDown : ChevronRight"
               reduced-motion="user"
             />
-            <div
-              aria-hidden="true"
-              :class="[
-                'size-[15px] text-[var(--text-secondary)]',
-                item.kind === 'directory'
-                  ? (item.expanded ? 'i-mingcute:folder-open-fill' : 'i-mingcute:folder-line')
-                  : (item.path === selectedPath ? 'i-mingcute:file-code-fill' : 'i-mingcute:file-code-line'),
-              ]"
+            <FileIcon
+              class="size-[15px] text-[var(--text-secondary)]"
+              :path="item.path"
+              :kind="item.kind"
+              :expanded="item.expanded"
+              :language-id="item.languageId"
+              :selected="item.path === selectedPath"
             />
             <span class="whitespace-nowrap [font-size:var(--font-size-ui)]" :title="item.path">{{ item.name }}</span>
             <span
@@ -140,7 +145,7 @@ function flattenEntries(
               class="size-1.25 rounded-full bg-[var(--accent)] opacity-70"
               :title="item.languageId"
             />
-          </button>
+          </Button>
         </ContextMenuTrigger>
         <ContextMenuPortal>
           <ContextMenuContent
@@ -177,17 +182,12 @@ function flattenEntries(
       <p v-if="error" class="m-0 max-w-64 text-center [font-size:var(--font-size-ui-sm)] text-[#ce6c64]">
         {{ error }}
       </p>
-      <button
-        :class="[
-          'px-2.5 py-1.75 border border-[var(--border-subtle)] rounded-lg',
-          'bg-[var(--surface-item)] [font-size:var(--font-size-ui-sm)] text-[var(--text-primary)]',
-          'hover:bg-[var(--surface-item-hover)] focus-visible:outline-2 focus-visible:outline-[var(--accent)]',
-        ]"
-        type="button"
+      <ActionButton
+        tone="neutral"
         @click="emit('openWorkspace')"
       >
         {{ loading ? 'Opening…' : 'Open Workspace' }}
-      </button>
+      </ActionButton>
     </div>
   </aside>
 </template>
