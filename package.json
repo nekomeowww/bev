@@ -24,13 +24,13 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "vscode-jsonrpc": "9.0.1",
-    "vscode-languageserver-protocol": "3.18.2"
+    "vscode-jsonrpc": "10.0.0",
+    "vscode-languageserver-protocol": "3.18.5"
   },
   "devDependencies": {
-    "@types/node": "24.0.15",
+    "@types/node": "26.6.5",
     "@vishot/cli": "^0.2.0",
-    "tsx": "4.23.5",
+    "tsx": "4.23.15",
     "typescript": "7.0.2",
     "vitest": "4.1.10"
   },
